@@ -1,0 +1,7 @@
+
+# total no. of rows in csv
+> nrow(csv)
+[1] 153
+# Column names inside csv file
+> colnames(read.csv(file="hw1_data.csv"))
+[1] "Ozone"   "Solar.R" "Wind"    "Temp"    "Month"   "Day" 
