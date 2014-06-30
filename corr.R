@@ -1,22 +1,32 @@
 corr <- function(directory, threshold = 0) {
-  ## 'directory' is a character vector of length 1 indicating
-  ## the location of the CSV files
-  
-  ## 'threshold' is a numeric vector of length 1 indicating the
-  ## number of completely observed observations (on all
-  ## variables) required to compute the correlation between
-  ## nitrate and sulfate; the default is 0
-  
-  ## Return a numeric vector of correlations
-  
-  total<-numeric()
-  for(file in list.files(directory)){
-    pollutantData<-read.table(paste(directory,"/",file,sep=""),sep=",",header=TRUE)
-    comple<-nrow(pollutantData[complete.cases(pollutantData),])
-    if(comple>threshold){
-      #total<-rbind(total,cor(pollutantData$nitrate,pollutantData$sulfate,use="complete.obs"))
-      total<-c(total,cor(pollutantData$nitrate,pollutantData$sulfate,use="complete.obs"))
+
+    completes <- complete(directory, 1:332)
+    completes <- subset(completes, nobs > threshold )
+
+    ## Initialize variables
+    correlations <- vector()
+
+    ## Loop over the passed id's
+    for(i in completes$id ) {
+
+        ## Pad the i to create a filename
+        filename <- sprintf("%03d.csv", i)
+        filepath <- paste(directory, filename, sep="/")
+
+        ## Load the data
+        data <- read.csv(filepath)
+
+        ## Calculate and store the count of complete cases
+        completeCases <- data[complete.cases(data),]
+        count <- nrow(completeCases)
+
+        ## Calculate and store the count of complete cases
+        ## if threshhold is reached
+        if( count >= threshold ) {
+            correlations <- c(correlations, cor(completeCases$nitrate, completeCases$sulfate) )
+        }
     }
-  }
-  as.numeric(total)
+
+    ## Return a numeric vector of correlations
+    correlations
 }
